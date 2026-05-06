@@ -47,7 +47,7 @@ const STORE_DEALS = {
     { id: 7, store: 'publix', name: 'Ground Turkey', price: 5.49, originalPrice: 7.99, unit: 'lb', image: '', coupon: 'BOGO' },
     { id: 8, store: 'publix', name: 'Cucumber', price: 0.99, originalPrice: 1.49, unit: 'each', image: '', coupon: null },
     { id: 9, store: 'publix', name: 'Cherry Tomatoes', price: 2.99, originalPrice: 3.99, unit: 'pint', image: '', coupon: null },
-    { id: 10, store: 'publix', name: 'Lemon', price: 0.59, originalPrice: 0.79, unit: 'each', image: '', null }
+    { id: 10, store: 'publix', name: 'Lemon', price: 0.59, originalPrice: 0.79, unit: 'each', image: '', coupon: null }
   ],
   walmart: [
     { id: 11, store: 'walmart', name: 'Broccoli Crown', price: 2.98, originalPrice: 3.98, unit: 'lb', image: '', coupon: 'Rollback' },
