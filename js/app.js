@@ -271,15 +271,47 @@ function renderShopPage() {
         <p class="subtitle">Manage your fridge inventory</p>
       </div>
 
-      <!-- Add Item -->
+      <!-- Camera / Snap Fridge -->
+      <div class="card-section camera-section">
+        <div class="card-header">
+          <h2>📸 Snap Your Fridge</h2>
+          <span class="badge">AI-Powered</span>
+        </div>
+        <div class="camera-area" id="cameraArea" onclick="document.getElementById('fridgeFileInput').click()">
+          <div class="camera-placeholder">
+            <span class="camera-icon">📷</span>
+            <p>Tap to snap photo of fridge</p>
+            <small>AI will identify items automatically</small>
+          </div>
+          <img id="fridgePreview" class="fridge-preview-img hidden">
+        </div>
+        <input type="file" id="fridgeFileInput" accept="image/*" capture="environment" hidden onchange="handleFridgePhoto(event)">
+        <button class="btn btn-primary" id="analyzeFridgeBtn" onclick="analyzeFridgePhoto()" disabled>
+          🤖 Analyze & Add Items
+        </button>
+        <div id="detectedItemsContainer"></div>
+      </div>
+
+      <!-- Add Item Manually -->
       <div class="card-section">
         <div class="card-header">
-          <h2>❄️ Add to Fridge</h2>
+          <h2>❄️ Add to Fridge (Manual)</h2>
         </div>
         <div class="add-item-form">
           <input type="text" id="addItemInput" placeholder="e.g., eggs, milk, chicken...">
           <button class="btn btn-primary" onclick="addFridgeItem()">+ Add</button>
         </div>
+      </div>
+
+      <!-- Daily Deals Scan -->
+      <div class="card-section">
+        <div class="card-header">
+          <h2>🔄 Daily Deals Scan</h2>
+        </div>
+        <button class="btn btn-secondary" onclick="scanForDeals()">
+          🔍 Scan for Today's Best Deals
+        </button>
+        <div id="dealScanResults" style="margin-top: 12px;"></div>
       </div>
 
       <!-- Current Fridge -->
@@ -746,6 +778,210 @@ async function sendAIChat() {
     loading.remove();
     container.innerHTML += `<div class="ai-msg assistant">Error: ${e.message}</div>`;
   }
+}
+
+// =====================
+// FRIDGE CAMERA FUNCTIONS
+// =====================
+let currentFridgePhoto = null;
+
+function handleFridgePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    currentFridgePhoto = e.target.result;
+    const preview = document.getElementById('fridgePreview');
+    const placeholder = document.querySelector('.camera-placeholder');
+    
+    preview.src = currentFridgePhoto;
+    preview.classList.remove('hidden');
+    placeholder.style.display = 'none';
+    
+    document.getElementById('analyzeFridgeBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeFridgePhoto() {
+  if (!currentFridgePhoto) {
+    alert('Please take a photo first!');
+    return;
+  }
+  
+  if (!state.apiKey) {
+    alert('You need to add your OpenRouter API key in Settings first!');
+    navigateTo('settings');
+    return;
+  }
+  
+  const btn = document.getElementById('analyzeFridgeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>🤔 Analyzing...</span>';
+  
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${state.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'anthropic/claude-3-haiku:free',
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'Look at this photo of a fridge or pantry. List ALL food items you can see. Return ONLY a JSON array like ["eggs", "milk", "cheese", "tomatoes"]. No other text.'
+            },
+            {
+              type: 'image_url',
+              image_url: { url: currentFridgePhoto }
+            }
+          ]
+        }]
+      })
+    });
+    
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '[]';
+    
+    // Parse the JSON response
+    let items = [];
+    try {
+      items = JSON.parse(content);
+    } catch {
+      // Try to extract array from text if not pure JSON
+      const match = content.match(/\[.*\]/);
+      if (match) items = JSON.parse(match[0]);
+    }
+    
+    if (items && items.length > 0) {
+      showDetectedItems(items);
+    } else {
+      alert('No items detected. Try a clearer photo or add items manually.');
+    }
+    
+  } catch (error) {
+    console.error('AI Error:', error);
+    alert('Failed to analyze. Make sure your API key is correct.');
+  }
+  
+  btn.disabled = false;
+  btn.innerHTML = '🤖 Analyze & Add Items';
+}
+
+function showDetectedItems(items) {
+  const container = document.getElementById('detectedItemsContainer');
+  container.innerHTML = `
+    <div class="detected-items-box">
+      <h4>Detected ${items.length} items:</h4>
+      <div class="detected-items-list">
+        ${items.map((item, idx) => `
+          <label class="detected-item">
+            <input type="checkbox" value="${item}" checked>
+            <span>${item}</span>
+          </label>
+        `).join('')}
+      </div>
+      <button class="btn btn-primary" onclick="addDetectedItems()">
+        ✓ Add to Fridge
+      </button>
+    </div>
+  `;
+}
+
+function addDetectedItems() {
+  const checkboxes = document.querySelectorAll('#detectedItemsContainer input[type="checkbox"]:checked');
+  let addedCount = 0;
+  
+  checkboxes.forEach(cb => {
+    const item = cb.value.toLowerCase().trim();
+    if (item && !state.fridge.some(f => f.toLowerCase() === item)) {
+      state.fridge.push(cb.value);
+      addedCount++;
+    }
+  });
+  
+  saveState();
+  document.getElementById('detectedItemsContainer').innerHTML = '';
+  currentFridgePhoto = null;
+  
+  // Reset camera area
+  document.getElementById('fridgePreview').classList.add('hidden');
+  document.querySelector('.camera-placeholder').style.display = 'flex';
+  document.getElementById('analyzeFridgeBtn').disabled = true;
+  document.getElementById('fridgeFileInput').value = '';
+  
+  navigateTo('shop');
+  alert(`Added ${addedCount} items to your fridge!`);
+}
+
+// =====================
+// DAILY DEALS SCAN
+// =====================
+let lastDealScan = localStorage.getItem('pantryai_last_deal_scan') || '';
+
+function scanForDeals() {
+  const today = new Date().toDateString();
+  
+  // Check if already scanned today
+  if (lastDealScan === today) {
+    const confirm = window.confirm('You already scanned deals today. Scan again anyway?');
+    if (!confirm) return;
+  }
+  
+  // Find best deals across all stores
+  const allDeals = Object.values(STORE_DEALS).flat();
+  const bestDeals = allDeals
+    .map(deal => ({
+      ...deal,
+      savings: deal.originalPrice - deal.price,
+      savingsPercent: Math.round(((deal.originalPrice - deal.price) / deal.originalPrice) * 100)
+    }))
+    .sort((a, b) => b.savingsPercent - a.savingsPercent)
+    .slice(0, 5);
+  
+  // Update last scan date
+  lastDealScan = today;
+  localStorage.setItem('pantryai_last_deal_scan', today);
+  
+  // Save found deals
+  const foundDeals = bestDeals.map(d => ({ id: d.id, store: d.store, name: d.name, price: d.price, originalPrice: d.originalPrice }));
+  localStorage.setItem('pantryai_todays_deals', JSON.stringify(foundDeals));
+  
+  // Display results
+  const container = document.getElementById('dealScanResults');
+  container.innerHTML = `
+    <div class="deal-scan-result">
+      <h4>🎉 Today's Top ${bestDeals.length} Deals:</h4>
+      ${bestDeals.map(deal => `
+        <div class="deal-scan-item" onclick="addDealToList('${deal.store}', ${deal.id})">
+          <span class="deal-store">${deal.store.toUpperCase()}</span>
+          <span class="deal-name">${deal.name}</span>
+          <span class="deal-savings">-${deal.savingsPercent}% ($${deal.savings.toFixed(2)})</span>
+        </div>
+      `).join('')}
+      <p style="font-size: 12px; color: #64748b; margin-top: 8px;">
+        Tap any deal to add to your shopping list
+      </p>
+    </div>
+  `;
+}
+
+// Load today's deals if exists
+function loadTodaysDeals() {
+  const saved = localStorage.getItem('pantryai_todays_deals');
+  if (saved) {
+    const deals = JSON.parse(saved);
+    const today = new Date().toDateString();
+    if (lastDealScan === today) {
+      return deals;
+    }
+  }
+  return null;
 }
 
 function setupGlobalEvents() {

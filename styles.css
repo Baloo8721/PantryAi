@@ -352,3 +352,58 @@ body {
   .deals-full-grid { grid-template-columns: repeat(2, 1fr); }
   .quick-actions { gap: 16px; }
 }
+
+/* Camera Section */
+.camera-section { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
+.camera-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: 0.2s;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.camera-area:hover { border-color: var(--primary); background: #ecfdf5; }
+.camera-placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.camera-icon { font-size: 40px; }
+.camera-placeholder p { font-weight: 500; }
+.camera-placeholder small { color: var(--text-light); font-size: 12px; }
+.fridge-preview-img { max-width: 100%; max-height: 200px; border-radius: var(--radius-md); }
+.fridge-preview-img.hidden { display: none; }
+
+/* Detected Items */
+.detected-items-box { background: white; padding: 16px; border-radius: var(--radius-md); margin-top: 12px; }
+.detected-items-box h4 { margin-bottom: 12px; color: var(--text-secondary); }
+.detected-items-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.detected-item { display: flex; align-items: center; gap: 6px; background: var(--primary-light); padding: 6px 12px; border-radius: var(--radius-full); font-size: 13px; }
+.detected-item input { width: 16px; height: 16px; }
+
+/* Deal Scan Results */
+.deal-scan-result { background: white; padding: 16px; border-radius: var(--radius-md); }
+.deal-scan-result h4 { color: var(--primary); margin-bottom: 12px; }
+.deal-scan-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.deal-scan-item:hover { background: var(--primary-light); }
+.deal-scan-item .deal-store { 
+  font-size: 10px; font-weight: 600; background: var(--secondary); color: white; 
+  padding: 2px 6px; border-radius: 4px; 
+}
+.deal-scan-item .deal-name { flex: 1; font-size: 13px; }
+.deal-scan-item .deal-savings { color: var(--primary); font-weight: 600; font-size: 12px; }
+
+/* Badge */
+.badge { background: var(--primary-light); color: var(--primary-dark); padding: 4px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; }
