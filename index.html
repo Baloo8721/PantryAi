@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FreshCart · AI Meal & Deal Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #fafaf9;
+      color: #1c1917;
+      line-height: 1.5;
+    }
+    :root {
+      --green-50: #f0faf3; --green-500: #3da05f; --green-600: #2d8049; --green-700: #1e6035;
+      --gray-900: #1c1917; --gray-800: #292524; --gray-700: #44403c; --gray-200: #e7e5e4;
+      --border: #e7e5e4; --bg-card: #fff; --accent: #3da05f; --accent-light: #d6f2de;
+      --sidebar-w: 260px; --topbar-h: 56px; --radius-lg: 20px; --radius-md: 12px;
+    }
+    /* Layout */
+    #app { display:grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+    #sidebar {
+      background: var(--gray-900); color: #fff; position: fixed; width: var(--sidebar-w); height: 100vh;
+      padding: 24px 16px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+    .brand-icon { font-size: 32px; }
+    .brand-name { font-family: 'DM Serif Display', serif; font-size: 20px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;
+      color: rgba(255,255,255,0.7); font-size: 14px; cursor: pointer; transition: 0.1s;
+    }
+    .nav-item:hover, .nav-item.active { background: var(--accent); color: white; }
+    .nav-section-label { font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.4); padding: 16px 12px 4px; letter-spacing: 1px; }
+    #main-content { grid-column: 2; padding: 32px; max-width: 1200px; margin-left: var(--sidebar-w); }
+    #topbar { display: none; position: fixed; top:0; left:0; right:0; background: var(--gray-900); color:white; padding: 12px 20px; z-index: 200; justify-content: space-between; align-items: center; }
+    /* Cards */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+    .card h2 { font-size: 20px; font-family: 'DM Serif Display', serif; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .btn { padding: 8px 16px; border-radius: 40px; border: none; font-weight: 500; cursor: pointer; background: var(--accent); color: white; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: #1c1917; }
+    input, select, textarea { width: 100%; padding: 10px 14px; border-radius: 30px; border: 1px solid var(--border); font-family: inherit; }
+    .fridge-item, .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .badge { background: var(--accent-light); color: var(--green-700); border-radius: 20px; padding: 4px 10px; font-size: 12px; }
+    .deal-card { background: #fff9e8; border-left: 4px solid #f5b042; padding: 12px; border-radius: 16px; margin-bottom: 12px; }
+    .savings-banner { background: linear-gradient(135deg, #1e6035, #3da05f); color: white; border-radius: 24px; padding: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    #ai-fab { position: fixed; bottom: 24px; right: 24px; background: var(--gray-900); color: white; width: 52px; height: 52px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 200; border: none; }
+    #ai-panel { position: fixed; bottom: 90px; right: 24px; width: 340px; background: white; border-radius: 24px; box-shadow: 0 20px 35px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; z-index: 201; transition: 0.2s; }
+    .hidden { display: none !important; }
+    .ai-msg { padding: 10px 14px; margin: 6px; border-radius: 20px; max-width: 80%; }
+    .user { background: var(--accent); color: white; align-self: flex-end; }
+    .assistant { background: #f1f5f9; align-self: flex-start; }
+    @media (max-width: 768px) {
+      #sidebar { transform: translateX(-100%); transition: 0.2s; }
+      #sidebar.open { transform: translateX(0); }
+      #topbar { display: flex; }
+      #main-content { margin-left: 0; margin-top: var(--topbar-h); padding: 20px; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="sidebar">
+    <div class="brand"><div class="brand-icon">🥗</div><div class="brand-name">FreshCart</div></div>
+    <div class="nav-section-label">Plan</div>
+    <div class="nav-item active" data-page="dashboard">🏠 Dashboard</div>
+    <div class="nav-item" data-page="fridge">❄️ My Fridge</div>
+    <div class="nav-item" data-page="meals">🍽️ Meal Planner</div>
+    <div class="nav-section-label">Shop</div>
+    <div class="nav-item" data-page="deals">🏷️ Deals & Coupons</div>
+    <div class="nav-item" data-page="shopping">🛒 Shopping List</div>
+    <div class="nav-section-label">You</div>
+    <div class="nav-item" data-page="profiles">👤 Diet Profiles</div>
+    <div class="nav-item" data-page="settings">⚙️ AI Settings</div>
+  </div>
+  <div id="topbar"><button id="menuToggle">☰</button><span class="brand-name">FreshCart</span><button id="cartShortcut">🛒</button></div>
+  <main id="main-content"></main>
+</div>
+<button id="ai-fab">✦</button>
+<div id="ai-panel" class="hidden"><div style="background:#1c1917; color:white; padding:12px 16px; display:flex; justify-content:space-between"><span>✦ AI Assistant</span><button id="closeAiPanel" style="background:none; border:none; color:white;">✕</button></div><div id="aiMessages" style="height:300px; overflow-y:auto; padding:12px; display:flex; flex-direction:column;"></div><div style="display:flex; gap:8px; padding:12px; border-top:1px solid #e7e5e4;"><input id="aiInput" placeholder="Ask me anything..."/><button id="sendAi">→</button></div></div>
+
+<script>
+  // ------------------- DATA & STATE -------------------
+  let fridge = JSON.parse(localStorage.getItem('freshcart_fridge') || '["tomatoes","cucumber","olive oil","feta cheese"]');
+  let dietProfile = localStorage.getItem('freshcart_diet') || 'mediterranean';
+  let customDietText = localStorage.getItem('freshcart_custom_diet') || '';
+  let peopleCount = parseInt(localStorage.getItem('freshcart_people') || '2');
+  let planHorizon = localStorage.getItem('freshcart_horizon') || 'weekly';
+  let apiKey = localStorage.getItem('openrouter_key') || '';
+  let shoppingList = [];
+  let currentMeals = [];
+
+  const RECIPES = [
+    { name: "Greek Salad", ingredients: ["tomatoes","cucumber","feta cheese","olive oil"], baseServings: 2 },
+    { name: "Lemon Herb Chicken", ingredients: ["chicken breast","lemon","garlic","olive oil"], baseServings: 2 },
+    { name: "Mediterranean Lentil Soup", ingredients: ["lentils","carrots","celery","olive oil"], baseServings: 3 },
+    { name: "Quinoa Tabbouleh", ingredients: ["quinoa","parsley","tomatoes","cucumber","lemon"], baseServings: 2 }
+  ];
+
+  const STORE_DEALS = {
+    publix: [{item:"Olive Oil", orig:12.99,sale:9.99,coupon:"$2 off"},{item:"Chicken Breast",orig:6.99,sale:4.99,coupon:"BOGO 50%"},{item:"Feta Cheese",orig:5.49,sale:3.99,coupon:"$1 off"}],
+    aldi: [{item:"Hummus",orig:2.89,sale:1.99,coupon:"Save $0.90"},{item:"Salmon",orig:9.99,sale:7.49,coupon:"$1.50 off"}],
+    greenwise: [{item:"Organic Spinach",orig:4.49,sale:3.29},{item:"Avocado",orig:1.79,sale:0.99,coupon:"extra 15%"}],
+    amazon: [{item:"Laundry Detergent",orig:14.99,sale:9.99,coupon:"20% sub & save"},{item:"Paper Towels",orig:8.99,sale:6.49}]
+  };
+
+  function saveFridge() { localStorage.setItem('freshcart_fridge', JSON.stringify(fridge)); renderCurrentPage(); }
+  function addIngredient() { let v=document.getElementById('newIng'); if(v.value){ fridge.push(v.value.trim()); saveFridge(); v.value='';} }
+  function removeIngredient(idx) { fridge.splice(idx,1); saveFridge(); }
+
+  function generateMealPlan() {
+    const days = planHorizon === 'daily' ? 1 : (planHorizon === 'weekly' ? 7 : 28);
+    let meals = [];
+    let needed = new Map();
+    for(let i=0;i<days;i++) {
+      let rec = RECIPES[i % RECIPES.length];
+      let scale = Math.ceil(peopleCount / rec.baseServings);
+      meals.push({ day:i+1, name: rec.name, ingredients: rec.ingredients });
+      rec.ingredients.forEach(ing => {
+        let low = ing.toLowerCase();
+        needed.set(low, (needed.get(low)||0) + scale);
+      });
+    }
+    fridge.forEach(f => { let low=f.toLowerCase(); if(needed.has(low)) { let q=needed.get(low)-1; if(q<=0) needed.delete(low); else needed.set(low,q); } });
+    shoppingList = Array.from(needed.entries()).map(([name,qty]) => ({ name: name[0].toUpperCase()+name.slice(1), qty, checked:false, dealApplied:null }));
+    currentMeals = meals;
+    localStorage.setItem('freshcart_shopping', JSON.stringify(shoppingList));
+    renderCurrentPage();
+  }
+
+  function applyCouponStacking() {
+    shoppingList = shoppingList.map(item => {
+      let best = null;
+      for(let store in STORE_DEALS) {
+        let found = STORE_DEALS[store].find(d => d.item.toLowerCase().includes(item.name.toLowerCase()));
+        if(found) { best = found; break; }
+      }
+      if(best) item.dealApplied = `Stacked: ${best.coupon || 'sale'} → save $${(best.orig-best.sale).toFixed(2)}`;
+      return item;
+    });
+    localStorage.setItem('freshcart_shopping', JSON.stringify(shoppingList));
+    renderCurrentPage();
+  }
+
+  function renderShoppingListUI() {
+    if(!shoppingList.length) return `<div class="empty-state">✨ Generate a meal plan first</div>`;
+    return shoppingList.map((item,i) => `<div class="shop-item"><input type="checkbox" data-idx="${i}" ${item.checked?'checked':''} style="margin-right:12px"><span style="flex:1">${item.name} x${item.qty}</span>${item.dealApplied?`<span class="badge">${item.dealApplied}</span>`:''}</div>`).join('');
+  }
+
+  // RENDER PAGES
+  function renderDashboard() { return `<div class="savings-banner"><div><h2>Smart Savings</h2><p>Based on your fridge + meals</p></div><div style="font-size:32px">💰 $${Math.floor(Math.random()*20)+12} est. saved</div></div><div class="grid-2"><div class="card"><h2>🥑 Fridge</h2>${fridge.map(f=>`<div>${f}</div>`).join('')||'empty'}</div><div class="card"><h2>👥 Settings</h2><label>People: <input type="number" id="ppl" value="${peopleCount}" style="width:70px"></label><select id="horizon"><option ${planHorizon==='daily'?'selected':''}>daily</option><option ${planHorizon==='weekly'?'selected':''}>weekly</option><option ${planHorizon==='monthly'?'selected':''}>monthly</option></select><button id="quickGen" class="btn" style="margin-top:12px">⟳ Regenerate Plan</button></div></div>`; }
+  function renderFridgePage() { return `<div class="card"><h2>❄️ My Fridge</h2><div style="display:flex; gap:8px"><input id="newIng" placeholder="e.g., spinach, chicken..."><button class="btn" id="addFridgeBtn">+ Add</button></div><div id="fridgeList">${fridge.map((f,i)=>`<div class="fridge-item"><span>🥕 ${f}</span><button class="btn-outline" data-remove="${i}">✕</button></div>`).join('')}</div></div>`; }
+  function renderMealsPage() { return `<div class="card"><h2>🍽️ Meal Plan (${planHorizon})</h2>${currentMeals.length?currentMeals.map(m=>`<div><b>Day ${m.day}</b> — ${m.name}</div>`).join('') : '<p>Click generate below</p>'}<button id="genPlanBtn" class="btn mt-16">✨ Generate Meal Plan</button></div><div class="card"><h2>🥗 Diet Profile</h2><select id="dietSelect"><option value="mediterranean" ${dietProfile==='mediterranean'?'selected':''}>Mediterranean</option><option value="custom" ${dietProfile==='custom'?'selected':''}>Custom</option></select><textarea id="customDiet" placeholder="e.g., no gluten, more fish">${customDietText}</textarea><button id="saveDietBtn" class="btn-outline">Save diet</button></div>`; }
+  function renderDealsPage() { let store = 'publix'; return `<div class="card"><h2>🏷️ Live Deals</h2><select id="storeSelect"><option value="publix">Publix</option><option value="aldi">Aldi</option><option value="greenwise">Greenwise</option><option value="amazon">Amazon</option></select><button id="refreshDeals" class="btn">Show deals</button><div id="dealsContainer">${STORE_DEALS.publix.map(d=>`<div class="deal-card"><b>${d.item}</b> — was $${d.orig} now $${d.sale} ${d.coupon?`+ ${d.coupon}`:''}</div>`).join('')}</div><button id="stackCouponsBtn" class="btn mt-16">🧾 Apply Stackable Coupons to Shopping List</button></div>`; }
+  function renderShoppingPage() { return `<div class="card"><h2>🛒 Smart Shopping List</h2><div id="shoppingListContainer">${renderShoppingListUI()}</div><button id="syncShoppingBtn" class="btn-outline">🔄 Sync from meal plan</button></div>`; }
+  function renderProfilesPage() { return `<div class="card"><h2>👤 Household & Diet</h2><label>Number of people:</label><input type="number" id="peopleInput" value="${peopleCount}"><label>Plan horizon:</label><select id="horizonInput"><option ${planHorizon==='daily'?'selected':''}>daily</option><option ${planHorizon==='weekly'?'selected':''}>weekly</option><option ${planHorizon==='monthly'?'selected':''}>monthly</option></select><button id="saveProfileBtn" class="btn">Save & regenerate</button></div>`; }
+  function renderSettingsPage() { return `<div class="card"><h2>⚙️ OpenRouter AI</h2><input type="password" id="apiKeyInput" placeholder="sk-or-v1-..." value="${apiKey}"><div class="text-muted">Free model: mistralai/mistral-7b-instruct</div><button id="saveApiKey" class="btn">Save Key</button><div id="aiTestMsg"></div></div>`; }
+
+  const pages = { dashboard:renderDashboard, fridge:renderFridgePage, meals:renderMealsPage, deals:renderDealsPage, shopping:renderShoppingPage, profiles:renderProfilesPage, settings:renderSettingsPage };
+  let currentPage = 'dashboard';
+
+  function renderCurrentPage() {
+    const content = pages[currentPage]();
+    document.getElementById('main-content').innerHTML = content;
+    attachPageHandlers();
+    document.querySelectorAll('.nav-item').forEach(nav=>{ nav.classList.toggle('active', nav.getAttribute('data-page')===currentPage); });
+  }
+
+  function attachPageHandlers() {
+    if(currentPage==='fridge') { document.getElementById('addFridgeBtn')?.addEventListener('click',addIngredient); document.querySelectorAll('[data-remove]').forEach(btn=>{ btn.addEventListener('click',(e)=>{ let idx=btn.getAttribute('data-remove'); removeIngredient(parseInt(idx)); }); }); }
+    if(currentPage==='meals') { document.getElementById('genPlanBtn')?.addEventListener('click',()=>{ peopleCount=parseInt(document.getElementById('peopleInput')?.value||peopleCount); generateMealPlan(); }); document.getElementById('saveDietBtn')?.addEventListener('click',()=>{ dietProfile=document.getElementById('dietSelect').value; customDietText=document.getElementById('customDiet').value; localStorage.setItem('freshcart_diet',dietProfile); localStorage.setItem('freshcart_custom_diet',customDietText); alert('Diet saved'); }); }
+    if(currentPage==='deals') { document.getElementById('refreshDeals')?.addEventListener('click',()=>{ let st=document.getElementById('storeSelect').value; let deals=STORE_DEALS[st]; document.getElementById('dealsContainer').innerHTML=deals.map(d=>`<div class="deal-card"><b>${d.item}</b> — was $${d.orig} now $${d.sale} ${d.coupon?`+ ${d.coupon}`:''}</div>`).join(''); }); document.getElementById('stackCouponsBtn')?.addEventListener('click',applyCouponStacking); }
+    if(currentPage==='shopping') { document.getElementById('syncShoppingBtn')?.addEventListener('click',generateMealPlan); const container=document.getElementById('shoppingListContainer'); if(container) container.querySelectorAll('input[type="checkbox"]').forEach(cb=>{ cb.addEventListener('change',(e)=>{ let idx=cb.getAttribute('data-idx'); if(idx!==null) shoppingList[parseInt(idx)].checked=cb.checked; localStorage.setItem('freshcart_shopping',JSON.stringify(shoppingList)); }); }); }
+    if(currentPage==='profiles') { document.getElementById('saveProfileBtn')?.addEventListener('click',()=>{ peopleCount=parseInt(document.getElementById('peopleInput').value); planHorizon=document.getElementById('horizonInput').value; localStorage.setItem('freshcart_people',peopleCount); localStorage.setItem('freshcart_horizon',planHorizon); generateMealPlan(); renderCurrentPage(); }); }
+    if(currentPage==='settings') { document.getElementById('saveApiKey')?.addEventListener('click',()=>{ apiKey=document.getElementById('apiKeyInput').value; localStorage.setItem('openrouter_key',apiKey); document.getElementById('aiTestMsg').innerHTML='✅ API key saved'; }); }
+    if(currentPage==='dashboard') { document.getElementById('quickGen')?.addEventListener('click',()=>{ peopleCount=parseInt(document.getElementById('ppl').value); planHorizon=document.getElementById('horizon').value; localStorage.setItem('freshcart_people',peopleCount); localStorage.setItem('freshcart_horizon',planHorizon); generateMealPlan(); renderCurrentPage(); }); }
+  }
+
+  // AI integration (OpenRouter)
+  async function askAI(question) {
+    if(!apiKey) return "⚠️ Please add your OpenRouter API key in Settings (free model available).";
+    try {
+      let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST", headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "mistralai/mistral-7b-instruct:free", messages: [{ role: "user", content: question }] })
+      });
+      let data = await res.json();
+      return data.choices?.[0]?.message?.content || "AI didn't respond.";
+    } catch(e) { return "AI error, check console."; }
+  }
+
+  // AI Chat Panel
+  const aiFab = document.getElementById('ai-fab'), aiPanel = document.getElementById('ai-panel');
+  aiFab.onclick = () => aiPanel.classList.toggle('hidden');
+  document.getElementById('closeAiPanel').onclick = () => aiPanel.classList.add('hidden');
+  document.getElementById('sendAi').onclick = async () => {
+    let inp = document.getElementById('aiInput'), msg = inp.value.trim();
+    if(!msg) return;
+    let container = document.getElementById('aiMessages');
+    container.innerHTML += `<div class="ai-msg user">${msg}</div>`;
+    inp.value = '';
+    let thinking = document.createElement('div'); thinking.className = 'ai-msg assistant'; thinking.innerText = '🤔 thinking...';
+    container.appendChild(thinking); container.scrollTop = container.scrollHeight;
+    let reply = await askAI(msg + " (fridge: "+fridge.join(', ')+", meal plan: "+currentMeals.length+" meals)");
+    thinking.remove();
+    container.innerHTML += `<div class="ai-msg assistant">${reply}</div>`;
+    container.scrollTop = container.scrollHeight;
+  };
+
+  // navigation
+  document.querySelectorAll('.nav-item').forEach(nav => nav.addEventListener('click', (e) => { currentPage = nav.getAttribute('data-page'); renderCurrentPage(); }));
+  document.getElementById('menuToggle')?.addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+  document.getElementById('cartShortcut')?.addEventListener('click',()=>{ currentPage='shopping'; renderCurrentPage(); });
+  // load stored shopping list
+  let storedShop = localStorage.getItem('freshcart_shopping');
+  if(storedShop) shoppingList = JSON.parse(storedShop);
+  generateMealPlan(); // initial
+  renderCurrentPage();
+</script>
+</body>
+</html>
