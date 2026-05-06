@@ -1,0 +1,7 @@
+{
+  "name": "PantryAi",
+  "version": 1,
+  "functions": {
+    "directory": "netlify/functions"
+  }
+}

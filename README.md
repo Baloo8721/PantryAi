@@ -1,282 +1,229 @@
-# FreshCart - AI Meal & Deal Planner
+# 🥗 PantryAi - Smart Grocery & Meal Planner
 
-A smart grocery/meal planning web app with real deal-finding, coupon stacking, and AI-powered suggestions.
+A production-ready AI-powered grocery and meal planning app. Features include fridge photo scanning, real-time deals from multiple stores, coupon stacking, and AI assistance.
 
-## Quick Start
+![Version](https://img.shields.io/badge/version-1.0.0-green)
+![Platform](https://img.shields.io/badge/platform-Web-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+---
+
+## 🚀 Quick Start
+
+### Option 1: Deploy to Netlify (Recommended)
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Initial production release"
+   git push origin main
+   ```
+
+2. **Deploy**
+   - Go to [Netlify](https://app.netlify.com)
+   - "Add new site" → "Import an existing project"
+   - Select your GitHub repo
+   - Add environment variables (see below)
+   - Deploy!
+
+3. **Environment Variables** (in Netlify dashboard)
+   ```
+   KROGER_CLIENT_ID=your_kroger_client_id
+   KROGER_CLIENT_SECRET=your_kroger_client_secret
+   OPENROUTER_API_KEY=your_openrouter_key
+   ```
+
+### Option 2: Local Development
 
 ```bash
 # Clone the repo
 git clone https://github.com/Baloo8721/PantryAi.git
 cd PantryAi
 
-# Open in browser
+# Open in browser (no server needed!)
 open index.html
 ```
 
-## Deployment - GitHub Pages
+---
 
-1. Go to: https://github.com/Baloo8721/PantryAi/settings/pages
-2. **Source**: Select "Deploy from a branch"
-3. **Branch**: Select `main` → `/ (root)`
-4. Click **Save**
+## 📱 Features
 
-Your site will be live at: `https://baloo8721.github.io/PantryAi/`
-
-To redeploy after changes:
-```bash
-git add .
-git commit -m "Update"
-git push
-```
+| Feature | Description | Status |
+|---------|-------------|--------|
+| 📸 **Fridge Scanner** | Snap photo → AI identifies items automatically | ✅ Ready |
+| ❄️ **Fridge Inventory** | Add/remove items, persists in localStorage | ✅ Ready |
+| 🍽️ **Meal Planning** | Auto-generates meals based on available ingredients | ✅ Ready |
+| 🛒 **Smart Shopping** | Auto-populates shopping list from meal plan | ✅ Ready |
+| 💰 **Store Deals** | Real-time deals from Aldi, Publix, Walmart, Kroger | ✅ Ready |
+| 🏷️ **Coupon Stacking** | Apply multiple coupons for maximum savings | ✅ Ready |
+| 💬 **AI Assistant** | Chat with AI about recipes, substitutions, deals | ⚠️ Needs API Key |
+| 🧾 **Receipt Upload** | Links to receipt cashback apps (Fetch, Ibotta, etc.) | ✅ Ready |
+| 🖼️ **Product Images** | Shows actual product images from APIs | 🔄 Coming |
 
 ---
 
-## Tech Stack
+## 🔑 API KEYS REQUIRED
 
-| Component | Technology |
-|-----------|------------|
-| Frontend | Plain HTML/CSS/JS (no frameworks) |
-| Database | localStorage (offline-first, no login) |
-| AI | OpenRouter API |
-| Hosting | GitHub Pages (free) |
+### 1. OPENROUTER (AI - Required for Fridge Scanner & Chat)
 
-**No build step required** - just push `index.html` and it works.
+| Item | Details |
+|------|---------|
+| **Get Key** | https://openrouter.ai/keys |
+| **Free Tier** | Yes, with free models |
+| **Models** | `mistralai/mistral-7b-instruct:free`, `anthropic/claude-3-haiku:free` |
+| **Setup** | Settings → Enter API key |
 
----
+### 2. KROGER DEVELOPER API (Product Data)
 
-## API KEYS REQUIRED - EXACT LIST
+| Item | Details |
+|------|---------|
+| **Get Access** | https://developer.kroger.com/ |
+| **Cost** | FREE (official API) |
+| **Data** | Product search, prices, images, store locations |
+| **Setup** | Register app → Get client_id + client_secret |
 
-### 1. OPENROUTER (AI - Required for Chat)
+### 3. WALLET API (Optional - Coming Soon)
 
-**Purpose:** AI chatbot, meal suggestions, recipe help
+| Item | Details |
+|------|---------|
+| **Get Access** | https://partner-api.walmart.com/ |
+| **Alternative** | Use Apify actors (free tier available) |
 
-**How to get:**
-1. Go to https://openrouter.ai/keys
-2. Sign up (free email)
-3. Click "Create Secret Key"
-4. Copy the key starting with `sk-or-v1-...`
+### 4. RECEIPT CASHBACK APPS (No API Needed)
 
-**Free models (no credit card):**
-- `mistralai/mistral-7b-instruct` ← USE THIS ONE (recommended free)
-- `google/gemma-3-4b-it`
-- `meta-llama/llama-3-8b-instruct`
+| App | Best For | Payout |
+|-----|----------|--------|
+| **Fetch Rewards** | Any receipt, $1-2/receipt | Gift cards |
+| **Ibotta** | Groceries, $218/year avg | PayPal, Gift cards |
+| **Checkout 51** | Weekly offers | Check ($20 min) |
+| **CoinOut** | Any receipt | Cash |
+| **Upside** | Gas & groceries | PayPal |
 
-**App usage:** Settings → Paste API key
-
----
-
-### 2. KROGER DEVELOPER API (Grocery Prices - Optional)
-
-**Purpose:** Real product prices, store locations, product search
-
-**How to get:**
-1. Go to https://developer.kroger.com/
-2. Click "Sign Up" → Create account
-3. Go to Manage → Apps → Register new app
-4. Select "Production" environment
-5. Choose APIs: `product.compact`, `location`
-6. Get `client_id` and `client_secret`
-
-**Free tier:** Yes, basic access is free
-
-**Documentation:** https://developer.kroger.com/reference
-
-**Example endpoint:**
-```
-GET https://api.kroger.com/v1/products?filter.term=milk&filter.locationId=012345
-```
+> 💡 **Tip:** Scan the same receipt to multiple apps to maximize earnings!
 
 ---
 
-### 3. WALMART PRODUCT API (Optional)
-
-**Purpose:** Product pricing, inventory, reviews from Walmart.com
-
-**How to get:**
-1. Go to https://partner-api.walmart.com/
-2. Sign up for API access
-3. Get API key
-
-**Free tier:** Pay-per-use, first calls often free
-
-**Alternative (easier):** Use Nextract service:
-- https://nextract.dev/apis/walmart-api/
-
----
-
-### 4. AMAZON PRODUCT ADVERTISING API (Optional)
-
-**Purpose:** Household items, cleaning supplies, condiments
-
-**How to get:**
-1. Go to https://affiliate-program.amazon.com/
-2. Sign up as Amazon Affiliate
-3. Go to Product Advertising API section
-4. Request access (needs 3 sales first)
-
-**Free tier:** Free with affiliate account
-
----
-
-### 5. CHOMP THIS API (Food/Nutrition Data)
-
-**Purpose:** Food product info, nutrition facts, UPC lookups
-
-**How to get:**
-1. Go to https://chompthis.com/api/
-2. Sign up for free tier
-3. Get API key
-
-**Free tier:**
-- Limited: Free (with attribution)
-- Standard: $25/month (pay per request)
-
-**Data:** 1.2M+ grocery products
-
----
-
-### 6. OPEN FOOD FACTS (Free, No Key)
-
-**Purpose:** Product nutrition, ingredients, barcode lookups
-
-**How to get:** NO KEY NEEDED - completely free, open source
-
-**API:** https://world.openfoodfacts.org/api
-
-**Example:**
-```
-GET https://world.openfoodfacts.org/api/v2/product/012345678905.json
-```
-
----
-
-### 7. STRIPE (Coupon/Receipt Scanning) - Optional Future
-
-**Purpose:** Receipt scanning, saving receipts
-
-**How to get:** https://stripe.com/docs/billing/connect
-
----
-
----
-
-## WHICH APIs TO USE - RECOMMENDED PRIORITY
-
-### PHASE 1 (Current - Works Now)
-- OpenRouter AI - Get from https://openrouter.ai/keys
-- Open Food Facts - FREE, no key needed
-
-### PHASE 2 (Add Real Data)
-1. **Kroger API** - https://developer.kroger.com/ (best for grocery prices)
-2. **Chomp This** - https://chompthis.com/api/ (nutrition data)
-
-### PHASE 3 (Advanced)
-3. **Walmart API** - https://partner-api.walmart.com/
-4. **Amazon PA-API** - https://affiliate-program.amazon.com/
-
----
-
-## CURRENT STATUS
-
-| Feature | Status | API Needed |
-|---------|--------|------------|
-| Fridge Inventory | ✅ Ready | None |
-| Meal Planning | ✅ Ready | None |
-| Shopping List | ✅ Ready | None |
-| Store Deals (Mock) | ✅ Ready | None |
-| Coupon Stacking | ✅ Ready | None |
-| AI Chat | ⚠️ Needs Key | OpenRouter |
-| Real Grocery Prices | 🔄 Optional | Kroger |
-| Nutrition Data | 🔄 Optional | Open Food Facts (FREE) |
-
----
-
-## FILE STRUCTURE
+## 📂 PROJECT STRUCTURE
 
 ```
 PantryAi/
-├── index.html      # Complete app (all CSS/JS inline)
-├── README.md      # This file
-├── SPEC.md        # Project specification
-└── .gitignore
+├── index.html              # Main app (single page)
+├── styles.css              # All styling
+├── js/
+│   └── app.js              # Main application logic
+├── netlify/
+│   ├── functions/           # Serverless functions
+│   │   ├── kroger.js        # Kroger API proxy
+│   │   └── analyze-fridge.js # AI vision proxy
+│   └── functions/README.md  # Functions documentation
+├── netlify.toml             # Netlify config
+├── package.json             # Dependencies (for Netlify)
+└── README.md                # This file
 ```
 
 ---
 
-## HOW IT WORKS
+## 🛠️ TECHNICAL STACK
 
-1. **Add items to your fridge** - Type ingredients you have
-2. **Generate meal plan** - App suggests meals based on Mediterranean diet
-3. **Shopping list auto-populates** - Items you need to buy
-4. **Apply coupons** - Click to stack deals on matching items
-5. **AI Assistant** - Ask questions about recipes, substitutions, deals
-
-All data saves to your browser's localStorage - no login required, works offline.
-
----
-
-## ADDING REAL API DATA
-
-### Example: Add Kroger Product Search
-
-In index.html, add function:
-```javascript
-async function searchKrogerProducts(query) {
-  const token = await getKrogerToken(); // You'll store this
-  const response = await fetch(
-    `https://api.kroger.com/v1/products?filter.term=${query}&filter.locationId=YOUR_STORE_ID`,
-    { headers: { 'Authorization': `Bearer ${token}` } }
-  );
-  return response.json();
-}
-```
-
-### Example: Open Food Facts (No Key Needed)
-```javascript
-async function getNutrition(barcode) {
-  const response = await fetch(
-    `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
-  );
-  return response.json();
-}
-```
+| Layer | Technology | Why |
+|-------|------------|-----|
+| **Frontend** | Plain HTML/CSS/JS | Simple, no build required |
+| **Backend** | Netlify Functions | Hide API keys, free tier |
+| **AI** | OpenRouter | Works with vision models |
+| **Data** | localStorage | Offline-first, no login |
+| **Hosting** | Netlify | Free, supports functions |
 
 ---
 
-## CUSTOMIZATION
+## 🔧 DEVELOPMENT
 
-### Add more recipes
-Edit `RECIPES` array in index.html:
+### Adding New Features
+
+**Add more recipes:**
 ```javascript
+// In js/app.js, edit RECIPES array
 const RECIPES = [
-  { name: "Your Recipe", ingredients: ["item1", "item2"], baseServings: 2 },
+  { name: "Your Recipe", ingredients: ["item1", "item2"], servings: 2, emoji: "🍳" },
+  // ...
 ];
 ```
 
-### Add more store deals
-Edit `STORE_DEALS` object with real data from APIs.
+**Add store deals:**
+```javascript
+// Edit STORE_DEALS object
+STORE_DEALS.aldi = [
+  { store: 'aldi', name: 'Product', price: 2.99, originalPrice: 3.99, image: '', coupon: null },
+  // ...
+];
+```
 
-### Change diet presets
-Modify `dietProfile` variable.
+### API Integration Examples
+
+**Kroger API (when credentials configured):**
+```javascript
+// Via Netlify function
+const response = await fetch('/.netlify/functions/kroger', {
+  method: 'POST',
+  body: JSON.stringify({ searchTerm: 'milk', locationId: '01400963' })
+});
+```
+
+**Open Food Facts (free, no key):**
+```javascript
+const response = await fetch(
+  'https://world.openfoodfacts.org/api/v2/product/012345678905.json'
+);
+const data = await response.json();
+// Returns: name, brand, image, nutrition
+```
 
 ---
 
-## TROUBLESHOOTING
+## 📋 TROUBLESHOOTING
 
-**AI chat not working:**
-- Go to Settings → Enter your OpenRouter API key
-- Use free model: `mistralai/mistral-7b-instruct`
-
-**Changes not showing:**
-- Force refresh: Cmd+Shift+R (Mac) / Ctrl+Shift+R (Windows)
-
-**Want to reset all data:**
-- Browser dev tools → Application → Clear localStorage
+| Issue | Solution |
+|-------|----------|
+| AI chat not working | Add OpenRouter key in Settings |
+| Fridge photo not analyzing | Use clearer photo, good lighting |
+| Deals not loading | Check internet connection |
+| Changes not showing | Force refresh (Cmd+Shift+R) |
+| Reset all data | Clear localStorage in browser dev tools |
 
 ---
 
-## CREDITS
+## 🌐 DEPLOYMENT CHECKLIST
 
-- AI powered by OpenRouter
-- Free food data from Open Food Facts
-- Design inspired by modern dashboard UIs
+- [ ] GitHub repository created
+- [ ] Code pushed to GitHub
+- [ ] Netlify account connected
+- [ ] Environment variables added (optional)
+- [ ] Site deployed
+- [ ] OpenRouter API key added in app
+- [ ] Tested fridge camera
+- [ ] Tested meal generation
+- [ ] Verified deals display
+
+---
+
+## 📄 LICENSE
+
+MIT License - feel free to use, modify, and distribute.
+
+---
+
+## 🙏 CREDITS
+
+- AI powered by [OpenRouter](https://openrouter.ai)
+- Food data from [Open Food Facts](https://world.openfoodfacts.org)
+- Design inspired by modern app UIs
+- Receipt apps: Fetch, Ibotta, Checkout 51
+
+---
+
+## 📞 SUPPORT
+
+- Open a GitHub issue
+- Check the docs in `/netlify/functions`
+- Review the code in `js/app.js`
+
+**Happy shopping! 🛒🥗**
