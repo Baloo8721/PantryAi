@@ -322,6 +322,7 @@ body {
   z-index: 200;
   padding: 16px;
 }
+.modal.hidden { display: none; }
 .modal-content {
   background: var(--bg-card);
   border-radius: var(--radius-lg);

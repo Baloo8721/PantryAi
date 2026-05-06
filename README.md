@@ -1,17 +1,13 @@
 # 🥗 PantryAi
 
-**⚠️ PRODUCTION APP LIVES HERE → https://pantry-ai.vercel.app**
+**⚠️ PRODUCTION APP LIVES HERE:**
 
----
+## 🔗 YOUR LIVE APP URL
 
-## 🚀 Quick Links
-
-| Platform | Status | URL |
-|----------|--------|-----|
-| **Vercel** | ✅ Production Ready | https://pantry-ai.vercel.app |
-| **GitHub Pages** | ❌ Not Supported | Disabled |
-
-**Use the Vercel link above - that's the real app!**
+**Use this URL (from your Vercel dashboard):**
+- Your Vercel deployment shows your unique URL
+- Check your Vercel dashboard at https://vercel.com/dashboard to find your exact URL
+- Example format: `pantry-xxx-xxx.vercel.app`
 
 ---
 
@@ -29,13 +25,12 @@
 
 ## 🔑 Getting Started
 
-1. **Go to:** https://pantry-ai.vercel.app
-2. **Click ⚙️ Settings** (top right)
+1. **Go to your Vercel app URL** (check dashboard)
+2. **Click ⚙️ Settings** (top right corner)
 3. **Add your API keys:**
    - OpenRouter (free): https://openrouter.ai/keys
    - Walmart API (optional): https://partner-api.walmart.com/
    - Amazon Affiliate Tag (optional)
-
 4. **Start using the app!**
 
 ---
