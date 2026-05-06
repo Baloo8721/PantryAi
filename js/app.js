@@ -58,6 +58,122 @@ function saveState() {
 }
 
 // =====================
+// FOOD CATEGORIZATION SYSTEM
+// =====================
+const FOOD_CATEGORIES = {
+  '🥩 Meats': {
+    keywords: ['chicken', 'beef', 'pork', 'turkey', 'steak', 'ground', 'bacon', 'sausage', 'ham', 'lamb', 'fish', 'salmon', 'shrimp', 'tuna', 'tilapia', 'meat', 'prosciutto', 'salami'],
+    icon: '🥩',
+    color: '#fca5a5'
+  },
+  '🥛 Dairy & Eggs': {
+    keywords: ['milk', 'cheese', 'eggs', 'yogurt', 'butter', 'cream', 'sour cream', 'cottage', 'mozzarella', 'cheddar', 'parmesan', 'feta', 'ricotta', 'margarine', 'half and half', 'egg'],
+    icon: '🥛',
+    color: '#fde68a'
+  },
+  '🥬 Vegetables': {
+    keywords: ['spinach', 'lettuce', 'kale', 'broccoli', 'carrots', 'carrot', 'celery', 'cucumber', 'tomatoes', 'tomato', 'pepper', 'peppers', 'onion', 'onions', 'garlic', 'potato', 'potatoes', 'mushroom', 'mushrooms', 'zucchini', 'squash', 'cabbage', 'corn', 'peas', 'beans', 'asparagus', 'avocado', 'cauliflower', 'brussels', 'sprouts', 'spinach'],
+    icon: '🥬',
+    color: '#86efac'
+  },
+  '🍎 Fruits': {
+    keywords: ['apple', 'apples', 'banana', 'bananas', 'orange', 'oranges', 'lemon', 'lemons', 'lime', 'grapes', 'strawberry', 'strawberries', 'blueberry', 'blueberries', 'mango', 'pineapple', 'peach', 'pear', 'pears', 'cherry', 'cherries', 'watermelon', 'cantaloupe', 'fruit'],
+    icon: '🍎',
+    color: '#fca5a5'
+  },
+  '🍞 Grains & Bread': {
+    keywords: ['bread', 'toast', 'bagel', 'bagels', 'tortilla', 'tortillas', 'pasta', 'rice', 'quinoa', 'oats', 'oatmeal', 'cereal', 'crackers', 'flour', 'noodles', 'ramen', 'couscous', 'barley', 'couscous'],
+    icon: '🍞',
+    color: '#fdba74'
+  },
+  '🫘 Beans & Legumes': {
+    keywords: ['chickpeas', 'black beans', 'kidney beans', 'lentils', 'beans', 'tofu', 'tempeh', 'hummus', 'peanut butter', 'almond butter'],
+    icon: '🫘',
+    color: '#d9f99d'
+  },
+  '🧴 Condiments & Sauces': {
+    keywords: ['ketchup', 'mustard', 'mayo', 'mayonnaise', 'sauce', 'soy sauce', 'hot sauce', 'bbq sauce', 'olive oil', 'oil', 'vinegar', 'dressing', 'honey', 'syrup', 'jam', 'jelly', 'pickles', 'relish'],
+    icon: '🧴',
+    color: '#c7d2fe'
+  },
+  '❄️ Frozen': {
+    keywords: ['frozen', 'ice cream', 'popsicle', 'pizza', 'fries'],
+    icon: '❄️',
+    color: '#bae6fd'
+  },
+  '🧊 Other': {
+    keywords: [],
+    icon: '🧊',
+    color: '#e2e8f0'
+  }
+};
+
+function getCategoryForItem(itemName) {
+  const lower = itemName.toLowerCase();
+  for (const [category, data] of Object.entries(FOOD_CATEGORIES)) {
+    if (category === '🧊 Other') continue;
+    for (const keyword of data.keywords) {
+      if (lower.includes(keyword)) return category;
+    }
+  }
+  return '🧊 Other';
+}
+
+function getFridgeStats() {
+  const stats = {};
+  state.fridge.forEach(item => {
+    const cat = getCategoryForItem(item);
+    if (!stats[cat]) stats[cat] = { count: 0, items: [] };
+    stats[cat].count++;
+    stats[cat].items.push(item);
+  });
+  return stats;
+}
+
+function renderCategorizedFridge() {
+  const stats = getFridgeStats();
+  const categories = Object.keys(FOOD_CATEGORIES).filter(c => stats[c]);
+  
+  return `
+    <div class="fridge-stats-bar">
+      ${Object.keys(FOOD_CATEGORIES).map(cat => {
+        const catData = FOOD_CATEGORIES[cat];
+        const count = stats[cat] ? stats[cat].count : 0;
+        return count > 0 ? `
+          <div class="stat-pill" style="background: ${catData.color}20; border-color: ${catData.color}">
+            ${catData.icon} ${count}
+          </div>
+        ` : '';
+      }).join('')}
+    </div>
+    <div class="fridge-categories">
+      ${categories.map(cat => {
+        const catData = FOOD_CATEGORIES[cat];
+        const catStats = stats[cat];
+        return `
+          <div class="category-section" style="border-left: 4px solid ${catData.color}">
+            <div class="category-header">
+              <span class="category-icon">${catData.icon}</span>
+              <span class="category-name">${cat.replace('🥩 ', '').replace('🥛 ', '').replace('🥬 ', '').replace('🍎 ', '').replace('🍞 ', '').replace('🫘 ', '').replace('🧴 ', '').replace('❄️ ', '').replace('🧊 ', '')}</span>
+              <span class="category-count">${catStats.count} items</span>
+            </div>
+            <div class="category-items">
+              ${catStats.items.map((item, idx) => {
+                const realIdx = state.fridge.indexOf(item);
+                return `<span class="category-item">
+                  ${item}
+                  <button class="remove-btn-sm" onclick="removeFridgeItem(${realIdx})">✕</button>
+                </span>`;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+// =====================
 // PAGE NAVIGATION - EVERY BUTTON DOES SOMETHING
 // =====================
 function navigateTo(page) {
@@ -314,19 +430,12 @@ function renderShopPage() {
         <div id="dealScanResults" style="margin-top: 12px;"></div>
       </div>
 
-      <!-- Current Fridge -->
+      <!-- Current Fridge - Categorized -->
       <div class="card-section">
         <div class="card-header">
-          <h2>Current Inventory (${state.fridge.length} items)</h2>
+          <h2>❄️ My Fridge (${state.fridge.length} items)</h2>
         </div>
-        <div class="fridge-inventory">
-          ${state.fridge.length > 0 ? state.fridge.map((item, idx) => `
-            <div class="fridge-item-full">
-              <span class="item-name">${item}</span>
-              <button class="remove-btn" onclick="removeFridgeItem(${idx})">✕</button>
-            </div>
-          `).join('') : '<p style="color: #94a3b8; text-align: center; padding: 20px;">Your fridge is empty. Add some items!</p>'}
-        </div>
+        ${state.fridge.length > 0 ? renderCategorizedFridge() : '<p style="color: #94a3b8; text-align: center; padding: 20px;">Your fridge is empty. Add some items!</p>'}
       </div>
 
       <!-- Shopping List -->
