@@ -20,211 +20,148 @@
         </div>
       </div>
       <div class="header-right">
-        <button class="icon-btn" id="cartBtn" title="Shopping Cart">🛒</button>
-        <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
+        <button class="icon-btn" id="cartBtn" onclick="navigateTo('shop')">🛒</button>
+        <button class="icon-btn" id="settingsBtn" onclick="navigateTo('settings')">⚙️</button>
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- SNAP FRIDGE SECTION -->
-      <section class="card-section" id="fridgeCamera">
-        <div class="card-header">
-          <h2>📸 Snap Your Fridge</h2>
-          <span class="badge">AI-Powered</span>
-        </div>
-        <div class="camera-upload-area" id="cameraUploadArea">
-          <div class="upload-placeholder" id="uploadPlaceholder">
-            <div class="upload-icon">📷</div>
-            <p>Tap to snap or upload photo</p>
-            <span class="sub-text">AI will identify items automatically</span>
-          </div>
-          <img id="previewImage" class="preview-image hidden" alt="Fridge preview">
-        </div>
-        <input type="file" id="fileInput" accept="image/*" capture="environment" hidden>
-        <button class="btn btn-primary" id="analyzeBtn" disabled>
-          🤖 Analyze Fridge
-        </button>
-        <div class="detected-items" id="detectedItems"></div>
-      </section>
-
-      <!-- FRIDGE INVENTORY -->
-      <section class="card-section" id="fridgeInventory">
-        <div class="card-header">
-          <h2>❄️ My Fridge</h2>
-          <span class="item-count" id="fridgeCount">4 items</span>
-        </div>
-        <div class="fridge-items" id="fridgeItems">
-          <!-- Items populated by JS -->
-        </div>
-        <div class="add-item-row">
-          <input type="text" id="addItemInput" placeholder="Add item...">
-          <button class="btn btn-secondary" id="addItemBtn">+</button>
-        </div>
-      </section>
-
-      <!-- TODAY'S MEAL -->
-      <section class="card-section" id="todaysMeal">
-        <div class="card-header">
-          <h2>🍽️ Today's Meal</h2>
-          <button class="btn btn-small" id="regenerateMeal">⟳</button>
-        </div>
-        <div class="meal-card" id="mealCard">
-          <div class="meal-name" id="mealName">Greek Salad with Chicken</div>
-          <div class="meal-ingredients" id="mealIngredients">3 items needed</div>
-        </div>
-        <div class="shopping-summary" id="shoppingSummary">
-          <span class="shopping-count">3 items to buy</span>
-          <span class="shopping-estimate">~$12.50 est.</span>
-        </div>
-      </section>
-
-      <!-- DEALS SECTION -->
-      <section class="card-section" id="dealsSection">
-        <div class="card-header">
-          <h2>💰 Best Deals Near You</h2>
-          <div class="store-filters">
-            <button class="store-filter active" data-store="all">All</button>
-            <button class="store-filter" data-store="aldi">ALDI</button>
-            <button class="store-filter" data-store="publix">Publix</button>
-            <button class="store-filter" data-store="walmart">Walmart</button>
-            <button class="store-filter" data-store="kroger">Kroger</button>
-          </div>
-        </div>
-        <div class="deals-grid" id="dealsGrid">
-          <!-- Deals populated by JS -->
-        </div>
-      </section>
-
-      <!-- SHOPPING LIST -->
-      <section class="card-section" id="shoppingListSection">
-        <div class="card-header">
-          <h2>🛒 Shopping List</h2>
-          <button class="btn btn-small" id="applyCoupons">Apply Coupons</button>
-        </div>
-        <div class="shopping-list" id="shoppingList">
-          <!-- Items populated by JS -->
-        </div>
-        <div class="savings-banner" id="savingsBanner">
-          <span>Total Savings: <strong id="totalSavings">$0.00</strong></span>
-        </div>
-      </section>
-
-      <!-- RECEIPTS SECTION -->
-      <section class="card-section" id="receiptsSection">
-        <div class="card-header">
-          <h2>🧾 Upload Receipts</h2>
-          <span class="badge">Earn Cash Back</span>
-        </div>
-        <div class="receipt-apps">
-          <div class="receipt-app-card">
-            <div class="app-icon">📱</div>
-            <div class="app-info">
-              <h3>Fetch Rewards</h3>
-              <p>Best for any receipt • $1-2/receipt</p>
-            </div>
-            <a href="https://fetchrewards.com" target="_blank" class="btn btn-small">Get App</a>
-          </div>
-          <div class="receipt-app-card">
-            <div class="app-icon">🛒</div>
-            <div class="app-info">
-              <h3>Ibotta</h3>
-              <p>Best for groceries • $218/year avg</p>
-            </div>
-            <a href="https://home.ibotta.com" target="_blank" class="btn btn-small">Get App</a>
-          </div>
-          <div class="receipt-app-card">
-            <div class="app-icon">💵</div>
-            <div class="app-info">
-              <h3>Checkout 51</h3>
-              <p>Weekly offers • $20 min payout</p>
-            </div>
-            <a href="https://checkout51.com" target="_blank" class="btn btn-small">Get App</a>
-          </div>
-        </div>
-        <div class="upload-receipt-area">
-          <p class="tip">💡 Tip: Scan same receipt to multiple apps to maximize earnings!</p>
-        </div>
-      </section>
+    <!-- MAIN CONTENT AREA - Pages -->
+    <main class="main-content" id="mainContent">
+      <!-- Content injected by JavaScript based on current page -->
     </main>
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-      <button class="nav-item active" data-page="home">
+      <button class="nav-item active" data-page="home" onclick="navigateTo('home')">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">Home</span>
       </button>
-      <button class="nav-item" data-page="meals">
+      <button class="nav-item" data-page="meals" onclick="navigateTo('meals')">
         <span class="nav-icon">🍽️</span>
         <span class="nav-label">Meals</span>
       </button>
-      <button class="nav-item" data-page="shopping">
+      <button class="nav-item" data-page="shop" onclick="navigateTo('shop')">
         <span class="nav-icon">🛒</span>
         <span class="nav-label">Shop</span>
       </button>
-      <button class="nav-item" data-page="deals">
+      <button class="nav-item" data-page="deals" onclick="navigateTo('deals')">
         <span class="nav-icon">🏷️</span>
         <span class="nav-label">Deals</span>
       </button>
-      <button class="nav-item" data-page="settings">
+      <button class="nav-item" data-page="settings" onclick="navigateTo('settings')">
         <span class="nav-icon">⚙️</span>
         <span class="nav-label">Settings</span>
       </button>
     </nav>
 
     <!-- AI Chat FAB -->
-    <button class="ai-fab" id="aiFab">💬</button>
+    <button class="ai-fab" id="aiFab" onclick="toggleAIChat()">💬</button>
 
     <!-- AI Chat Panel -->
     <div class="ai-panel hidden" id="aiPanel">
       <div class="ai-panel-header">
         <span>🤖 AI Assistant</span>
-        <button id="closeAiPanel">✕</button>
+        <button onclick="toggleAIChat()">✕</button>
       </div>
       <div class="ai-messages" id="aiMessages"></div>
       <div class="ai-input-area">
         <input type="text" id="aiInput" placeholder="Ask about recipes, deals...">
-        <button id="sendAi">→</button>
+        <button onclick="sendAIChat()">→</button>
       </div>
     </div>
 
     <!-- Settings Modal -->
-    <div class="modal hidden" id="settingsModal">
+    <div class="modal" id="settingsModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>⚙️ Settings</h2>
-          <button class="close-modal" id="closeSettings">✕</button>
+          <h2>⚙️ API Settings</h2>
+          <button class="close-modal" onclick="closeSettings()">✕</button>
         </div>
         <div class="modal-body">
-          <div class="setting-group">
-            <label>OpenRouter API Key</label>
-            <input type="password" id="apiKeyInput" placeholder="sk-or-v1-...">
-            <small>Get free key at openrouter.ai/keys</small>
+          <!-- AI Section -->
+          <div class="settings-section">
+            <h3>🤖 AI (Required for Smart Features)</h3>
+            <div class="setting-group">
+              <label>OpenRouter API Key</label>
+              <input type="password" id="apiKeyInput" placeholder="sk-or-v1-...">
+              <small>Get free at openrouter.ai/keys - powers AI chat & fridge photo scan</small>
+            </div>
           </div>
-          <div class="setting-group">
-            <label>Kroger Client ID</label>
-            <input type="text" id="krogerClientId" placeholder="Your Kroger client ID">
+
+          <!-- Store APIs -->
+          <div class="settings-section">
+            <h3>🛒 Store APIs (Optional - for real deals/prices)</h3>
+            <div class="setting-group">
+              <label>Walmart API Key</label>
+              <input type="text" id="walmartApiKey" placeholder="Your Walmart API key">
+              <small>Get at partner-api.walmart.com</small>
+            </div>
+            <div class="setting-group">
+              <label>Amazon Affiliate Tag</label>
+              <input type="text" id="amazonTag" placeholder="your-tag-20">
+              <small>Your Amazon Associates tag for referrals</small>
+            </div>
+            <div class="setting-group">
+              <label>Target API (optional)</label>
+              <input type="text" id="targetApiKey" placeholder="Target API key">
+            </div>
+            <p style="font-size: 12px; color: #64748b; margin-top: 12px;">
+              <strong>Note:</strong> Aldi, Publix, Greenwise don't offer public APIs. 
+              Use the Deals page to search deals manually or use the receipt apps below for savings.
+            </p>
           </div>
-          <div class="setting-group">
-            <label>Kroger Client Secret</label>
-            <input type="password" id="krogerClientSecret" placeholder="Your Kroger client secret">
+
+          <!-- Receipt Cashback -->
+          <div class="settings-section">
+            <h3>🧾 Receipt Cashback Apps</h3>
+            <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">
+              Scan receipts to these apps to earn cash back:
+            </p>
+            <div class="cashback-list">
+              <div class="cashback-app">
+                <span class="app-name">Fetch Rewards</span>
+                <span class="app-value">$1-2/receipt</span>
+                <a href="https://fetchrewards.com" target="_blank" class="btn btn-small">Get</a>
+              </div>
+              <div class="cashback-app">
+                <span class="app-name">Ibotta</span>
+                <span class="app-value">$218/yr avg</span>
+                <a href="https://home.ibotta.com" target="_blank" class="btn btn-small">Get</a>
+              </div>
+              <div class="cashback-app">
+                <span class="app-name">Checkout 51</span>
+                <span class="app-value">$20 min payout</span>
+                <a href="https://checkout51.com" target="_blank" class="btn btn-small">Get</a>
+              </div>
+              <div class="cashback-app">
+                <span class="app-name">Upside</span>
+                <span class="app-value">Gas + grocery</span>
+                <a href="https://upside.com" target="_blank" class="btn btn-small">Get</a>
+              </div>
+            </div>
           </div>
-          <div class="setting-group">
-            <label>People in Household</label>
-            <input type="number" id="householdSize" value="2" min="1" max="10">
+
+          <!-- Household Settings -->
+          <div class="settings-section">
+            <h3>👥 Household</h3>
+            <div class="setting-group">
+              <label>People in Household</label>
+              <input type="number" id="householdSize" value="2" min="1" max="10">
+            </div>
+            <div class="setting-group">
+              <label>Diet Preference</label>
+              <select id="dietPreference">
+                <option value="mediterranean">Mediterranean</option>
+                <option value="low-carb">Low Carb</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="keto">Keto</option>
+                <option value="none">No Restrictions</option>
+              </select>
+            </div>
           </div>
-          <div class="setting-group">
-            <label>Diet Preference</label>
-            <select id="dietPreference">
-              <option value="mediterranean">Mediterranean</option>
-              <option value="low-carb">Low Carb</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Vegan</option>
-              <option value="keto">Keto</option>
-              <option value="none">No Restrictions</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" id="saveSettings">Save Settings</button>
+
+          <button class="btn btn-primary" onclick="saveSettings()">Save All Settings</button>
         </div>
       </div>
     </div>
